@@ -1,4 +1,5 @@
 var audioElement = window.ae = document.getElementById('a0');
+var headerElement = document.getElementById('title');
 
 function getCookie(cookiename) {
   var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
@@ -7,6 +8,7 @@ function getCookie(cookiename) {
 
 // Get a random audio file from the server
 var audiofile = getCookie('audiofile');
+headerElement.innerText = audiofile;
 console.log('audiofile:', audiofile);
 audioElement.src = '/audio/' + audiofile;
 audioElement.load();

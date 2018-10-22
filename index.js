@@ -29,12 +29,25 @@ setInterval(()=> {
       return fn.endsWith('.wav') || fn.endsWith('.mp3');
     });
 
-    // Log if the number of files changed
+    // check if files were removed
+    if (cdb.ready && cdb.content && cdb.content.files) {
+      for (let fn in cdb.content.files) { // for each file in cdb
+        if (cdb.content.files.hasOwnProperty(fn)) { 
+          if (!files.includes(fn)){       // check if that files is also in the new
+            console.log(`remove ${fn} fromcdb`);
+            delete cdb.content.files[fn]; // if not, remove
+          }
+        }
+      }
+    }
+
     if (files.length !== audioFilenames.length) {
+
       console.log(`There are ${files.length} audio files`, files);
     }
     // stick the filenames in a global variable
     audioFilenames = files;
+
   });
 }, 500);
 
@@ -45,15 +58,17 @@ const app = express();
 const EMPTY_OBJECT = {};
 
 // Make cookes available as json to method handlers
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(bodyParser.json());
 
 // give every request a random audio filename
 app.use(function(req, res, next){
-  if (audioFilenames.length) {
-    const fns = audioFilenames;
-    const fn = fns[Math.floor(Math.random()*fns.length)]
-    res.cookie('audiofile', fn);
+  if (req.path === '/' || req.path.split('/').length === 1) {
+    if (audioFilenames.length) {
+      const fns = audioFilenames;
+      const fn = fns[Math.floor(Math.random()*fns.length)]
+      res.cookie('audiofile', fn);
+    }
   }
   next();
 });
