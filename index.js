@@ -134,4 +134,9 @@ app.get('/random/audiofile', function(req, res){
   }
 });
 
+app.get('/all/audiofiles', function(req, res){
+  res.setHeader('Content-Type', 'application/json');
+  res.end(JSON.stringify(audioFilenames));
+});
+
 const server = app.listen(3000, '127.0.0.1');

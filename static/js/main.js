@@ -8,7 +8,7 @@ function getCookie(cookiename) {
 
 // Get a random audio file from the server
 var audiofile = getCookie('audiofile');
-headerElement.innerText = audiofile;
+headerElement.innerText = trimAudiofile(audiofile);
 console.log('audiofile:', audiofile);
 audioElement.src = '/audio/' + audiofile;
 audioElement.load();
@@ -48,7 +48,6 @@ audioElement.addEventListener('play', function(){
     var time = Math.floor(this.currentTime);
     lastSend = time;
     send({ time });
-    console.log('playing', time);
   };
 
   s();
@@ -63,3 +62,5 @@ audioElement.addEventListener('pause', function(){
   lastSend = null;
   clearInterval(interval);
 });
+
+
