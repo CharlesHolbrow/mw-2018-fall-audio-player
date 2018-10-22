@@ -125,4 +125,13 @@ app.get('/alldata/', function(req,res){
   res.end(JSON.stringify(cdb.content.files));
 });
 
+app.get('/random/audiofile', function(req, res){
+  if (audioFilenames.length) {
+    res.setHeader('Content-Type', 'text/plain')
+    res.end(audioFilenames[Math.floor(Math.random()*audioFilenames.length)]);
+  } else {
+    res.status(503).send('not ready');
+  }
+});
+
 const server = app.listen(3000, '127.0.0.1');
