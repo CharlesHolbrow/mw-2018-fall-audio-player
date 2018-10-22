@@ -42,6 +42,7 @@ setInterval(()=> {
 //
 // Setup Express
 const app = express();
+const EMPTY_OBJECT = {};
 
 // Make cookes available as json to method handlers
 app.use(cookieParser());
@@ -60,7 +61,7 @@ app.use(function(req, res, next){
 app.use('/audio', express.static(path.join(__dirname, 'audio')));
 app.use('/', express.static(path.join(__dirname, 'static')));
 
-// 
+// store the playback data in cdb
 app.post('/playing', function(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({ok: true}));
@@ -69,7 +70,7 @@ app.post('/playing', function(req, res) {
   const audiofile = req.body.playing;
   const time = req.body.time;
   if (!cdb.ready) return;
-  if (typeof audiofile !== 'string' || audiofile.length > 128) return;
+  if (typeof audiofile !== 'string' || audiofile.length > 128 || EMPTY_OBJECT[audiofile]) return;
   if (typeof time !== 'number') return;
   if (!cdb.content.files) cdb.content.files = {};
   if (!cdb.content.files[audiofile]) cdb.content.files[audiofile] = {
@@ -82,7 +83,31 @@ app.post('/playing', function(req, res) {
   } else {
     dbInfo.playData[time]++;
   }
+});
 
+app.get('/play/:audiofile', function(req, res){
+  res.cookie('audiofile', req.params.audiofile);
+  res.sendFile(path.join(__dirname, 'static/index.html'));
+});
+
+app.get('/data/:audiofile', function(req, res){
+  const audiofile = req.params.audiofile;
+  if (typeof audiofile !== 'string' || audiofile.length > 128 || EMPTY_OBJECT[audiofile]) return;
+  if (!cdb.ready) return;
+  if (!cdb.content.files) cdb.content.files = {};
+
+  const data = cdb.content.files[audiofile]
+  if (!data) return res.status(404).send('Not found');
+  
+  res.setHeader('Content-Type', 'application/json');
+  res.end(JSON.stringify(data));
+});
+
+app.get('/alldata/', function(req,res){
+  if (!cdb.ready) return res.status(503).send('not ready');
+  if (!cdb.content || !cdb.content.files) return res.status(503).send('retry');
+  res.setHeader('Content-Type', 'application/json');
+  res.end(JSON.stringify(cdb.content.files));
 });
 
 const server = app.listen(3000, '127.0.0.1');
