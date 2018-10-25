@@ -17,7 +17,7 @@ fs.readFile('db.json', 'utf8', (err, data) => {
       console.log('loaded db.json');
     } catch(e) {
       cdb.content = {};
-      console.log('failed to parse json');
+      console.log('failed to parse db.json');
     }
   }
   cdb.ready = true;
